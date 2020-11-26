@@ -43,7 +43,8 @@ let notes = [{
 
 ]
 app.get('/', (req, res) => {
-    res.send('<h1>Hello Africa aa: check for other files too : <br> =/api/notes  <br> =/api/files</h2>')
+    res.sendFile(path.join(__dirname + '/index.html'))
+    
 })
 app.get('/api/notes', (req, res) => {
     res.json(notes)

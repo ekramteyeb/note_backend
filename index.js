@@ -10,6 +10,9 @@ const cors = require('cors')
 app.use(express.json())
 //allow cross origin sharing//
 app.use(cors())
+//enables the app to consume static files in bult front end folder
+app.use(express.static('build'))
+
 let notes = [{
         id: 1,
         content: "HTML is easy",
@@ -43,7 +46,7 @@ let notes = [{
 
 ]
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname + '/index.html'))
+    res.sendFile(path.join(__dirname + '/build/index.html'))
     
 })
 app.get('/api/notes', (req, res) => {

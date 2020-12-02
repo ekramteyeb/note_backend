@@ -1,17 +1,11 @@
+require('dotenv').config()
 //express node
 const express = require('express')
 const app = express()
 const path = require('path')
-const PORT = process.env.PORT || 3001
-const mongoose = require('mongoose')
-const dotenv = require('dotenv')
-dotenv.config()
-
+const Note = require('./models/note')
 const cors = require('cors')
-const password = process.env.CONN_PASS
-const url = `mongodb+srv://daki_group:${password}@reemah.1xrf2.mongodb.net/note-app?retryWrites=true&w=majority`
 
-mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
 
 //Json parser ...... express helper
 app.use(express.json())
@@ -20,54 +14,8 @@ app.use(cors())
 //enables the app to consume static files in built front end folder
 app.use(express.static('build'))
 
-const noteSchema = new mongoose.Schema({
-  content: String,
-  date: Date,
-  important: Boolean,
-})
-//modifiy the mongose_id and delete the  __v 
-noteSchema.set('toJSON', {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString()
-    delete returnedObject._id
-    delete returnedObject.__v
-  }
-})
-const Note = mongoose.model('Note', noteSchema)
 
-/* let notes = [{
-        id: 1,
-        content: "HTML is easy",
-        date: "2019-05-30T17:30:31.098Z",
-        important: true
-    },
-    {
-        id: 2,
-        content: "Browser can execute only Javascript",
-        date: "2019-05-30T18:39:34.091Z",
-        important: false
-    },
-    {
-        id: 3,
-        content: "GET and POST are the most important methods of HTTP protocol",
-        date: "2019-05-30T19:20:14.298Z",
-        important: true
-    },
-    {
-        id: 4,
-        content: "Hello world app is coming back ",
-        date: "2020-05-30T19:20:14.298Z",
-        important: true
-    },
-    {
-        id: 5,
-        content: "Hello world of woar : hco",
-        date: "2020-05-30T19:20:14.298Z",
-        important: true
-    }
-
-] */
-app.get('/', (req, res) => {
+ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname + '/build/index.html'))
     
 })
@@ -78,13 +26,13 @@ app.get('/api/notes', (req, res) => {
     })
 })
  app.get('/api/notes/:id', (req, res) => {
-    const id = Number(req.params.id)
-    const note = notes.find(note => note.id === id)
-    if(note){
+    const id = req.params.id
+    Note.findById(id).then(note => {
         res.json(note)
-    }else{
+    }).catch(e => {
+        
         res.status(400).end()
-    }
+    })
 })
 
 app.delete('/api/notes/:id', (request, response) => {
@@ -105,18 +53,17 @@ const generateId = () => {
     }
 app.post('/api/notes', (req,res) => {
     const body = req.body
-    if(!body.content){
+    if(!body.content || body.content === undefined){
        return res.status(400).json({error:"no contetnt provided"})
     }else{
-    const note = {
-        content:body.content,
-        important: Math.random() < 0.5,
-        data: new Date,
-        id: generateId()
-    }
-    console.log(note)
-    notes = notes.concat(note)
-    res.json(note)
+        const note = new Note ({
+            content:body.content,
+            important: body.important || false,
+            data: new Date(),
+        })
+        note.save().then(savedNote => {
+            res.json(savedNote)
+        })
     }
 })
 
@@ -139,7 +86,7 @@ app.put('/api/notes/:id', (req, res) => {
 //to catch unknown endpoints 
 //app.use(unknownEndpoint)
 
-
+const PORT = process.env.PORT
 app.listen(PORT, (error) => {
     console.log(`Server running on port ${PORT}`)
 })

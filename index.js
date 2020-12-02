@@ -3,17 +3,31 @@ const express = require('express')
 const app = express()
 const path = require('path')
 const PORT = process.env.PORT || 3001
-
+const mongoose = require('mongoose')
+/* const dotenv = require('dotenv');
+dotenv.config();
+ */
 const cors = require('cors')
+const password = process.env.CONN_PASS
+const url = `mongodb+srv://daki_group:${password}@reemah.1xrf2.mongodb.net/note-app?retryWrites=true&w=majority`
+console.log('word')
+mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
 
 //Json parser ...... express helper
 app.use(express.json())
 //allow cross origin sharing//
 app.use(cors())
-//enables the app to consume static files in bult front end folder
+//enables the app to consume static files in built front end folder
 app.use(express.static('build'))
 
-let notes = [{
+const noteSchema = new mongoose.Schema({
+  content: String,
+  date: Date,
+  important: Boolean,
+})
+const Note = mongoose.model('Note', noteSchema)
+
+/* let notes = [{
         id: 1,
         content: "HTML is easy",
         date: "2019-05-30T17:30:31.098Z",
@@ -44,13 +58,15 @@ let notes = [{
         important: true
     }
 
-]
+] */
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname + '/build/index.html'))
     
 })
 app.get('/api/notes', (req, res) => {
-    res.json(notes)
+    Note.find({}).then(notes => {
+        res.json(notes)
+    })
 })
  app.get('/api/notes/:id', (req, res) => {
     const id = Number(req.params.id)

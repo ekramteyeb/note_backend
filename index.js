@@ -25,6 +25,14 @@ const noteSchema = new mongoose.Schema({
   date: Date,
   important: Boolean,
 })
+//modifiy the mongose_id and delete the  __v 
+noteSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  }
+})
 const Note = mongoose.model('Note', noteSchema)
 
 /* let notes = [{

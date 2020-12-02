@@ -4,13 +4,13 @@ const app = express()
 const path = require('path')
 const PORT = process.env.PORT || 3001
 const mongoose = require('mongoose')
-/* const dotenv = require('dotenv');
-dotenv.config();
- */
+const dotenv = require('dotenv')
+dotenv.config()
+
 const cors = require('cors')
 const password = process.env.CONN_PASS
 const url = `mongodb+srv://daki_group:${password}@reemah.1xrf2.mongodb.net/note-app?retryWrites=true&w=majority`
-console.log('word')
+
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
 
 //Json parser ...... express helper
@@ -66,6 +66,7 @@ app.get('/', (req, res) => {
 app.get('/api/notes', (req, res) => {
     Note.find({}).then(notes => {
         res.json(notes)
+        mongoose.connection.close()
     })
 })
  app.get('/api/notes/:id', (req, res) => {

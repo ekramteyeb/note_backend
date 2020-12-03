@@ -17,12 +17,12 @@ app.use(express.static('build'))
 
  app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname + '/build/index.html'))
-    
+
 })
 app.get('/api/notes', (req, res) => {
     Note.find({}).then(notes => {
         res.json(notes)
-        mongoose.connection.close()
+        //mongoose.connection.close()
     })
 })
  app.get('/api/notes/:id', (req, res) => {
@@ -30,7 +30,7 @@ app.get('/api/notes', (req, res) => {
     Note.findById(id).then(note => {
         res.json(note)
     }).catch(e => {
-        
+
         res.status(400).end()
     })
 })
@@ -67,7 +67,7 @@ app.post('/api/notes', (req,res) => {
     }
 })
 
-app.put('/api/notes/:id', (req, res) => {    
+app.put('/api/notes/:id', (req, res) => {
     const id = Number(req.params.id)
     const note = notes.find(n => n.id === id)
     if(note){
@@ -83,7 +83,7 @@ app.put('/api/notes/:id', (req, res) => {
     }
 })
 
-//to catch unknown endpoints 
+//to catch unknown endpoints
 //app.use(unknownEndpoint)
 
 const PORT = process.env.PORT
@@ -99,10 +99,3 @@ const sum2 = (...arguments) => {
     }
     return sumofAll
 }
-
-
-
-
-
-
-

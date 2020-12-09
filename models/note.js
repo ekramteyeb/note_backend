@@ -5,7 +5,7 @@ console.log('connecting to', url)
 
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
   .then(result => {
-    console.log('connected to MongoDB')
+    console.log(result.connections[0].name,'connected to MongoDB')
   })
   .catch((error) => {
     console.log('error connecting to MongoDB:', error.message)
@@ -24,7 +24,7 @@ const noteSchema = new mongoose.Schema({
   important: Boolean,
 })
 
-//modifiy the mongose_id and delete the  __v 
+//modifiy the mongose_id and delete the  __v
 noteSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString()
